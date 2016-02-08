@@ -1,3 +1,14 @@
+// ==UserScript==
+// @name         FaceIT match room advanced stats
+// @namespace    http://tampermonkey.net/
+// @version      0.2
+// @description  Shows elo, level and cs go steam hours for each player on match screen.
+// @author       Viaceslavas 'fire_bot' Duk
+// @match        https://beta.faceit.com/en/csgo/room*
+// @grant        none
+// ==/UserScript==
+/* jshint -W097 */
+'use strict';
 
 // You can get your web api key from https://steamcommunity.com/dev/apikey 
 var webkey = "YOUR STEAM WEB API KEY GOES HERE";
@@ -44,7 +55,7 @@ var draw = function(data, csgoPayload, matchItems, idx) {
         }
       } catch (err) {
     }
-    // var csgoPayload = { 'csgo_skill_level' : 4};
+
     var style = "position: absolute; z-index: 3;right: 34px;bottom: -6px;width: 24px;height: 24px";
     var imgHtml = "<div style='" + style + "'><img src='https://cdn.faceit.com/frontend/75/assets/images/skill-icons/skill_level_" + csgoPayload['csgo_skill_level'] + "_sm.png'/></div>";
     var resultHTML = "<div class='pa-sm btn-block' style='padding-top: 0px !important;'>";
