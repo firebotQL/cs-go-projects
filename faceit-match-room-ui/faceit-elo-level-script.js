@@ -4,7 +4,7 @@
 // @version      0.2
 // @description  Shows elo, level and cs go steam hours for each player on match screen.
 // @author       Viaceslavas 'fire_bot' Duk
-// @match        https://beta.faceit.com/en/csgo/room*
+// @match        https://beta.faceit.com/*
 // @grant        none
 // ==/UserScript==
 // CREDIT AND KUDOS TO: PyroZeroX. AngularJS example from: https://gist.github.com/PyroZeroX/9e75b2a205e842b0ecbb
@@ -13,31 +13,38 @@
 
 // You can get your web api key from https://steamcommunity.com/dev/apikey 
 var webkey = "YOUR STEAM WEB API KEY GOES HERE";
+        
+var drawStats = function(match) {
+    if (match != null) {
+        var factions = match.faction1.slice(0).concat(match.faction2);
+        cleanPrevious();
+ 
+        $(factions).each(function(index, player) {
+            var steamID = player['csgo_id'];
+            var steamURL = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + webkey + "&steamid=" + steamID + "&format=json"
+
+            // Proxy based on https://github.com/afeld/jsonp 
+            $.ajax({   url: "https://jsonp-steamid-proxy.herokuapp.com/?url=" + encodeURIComponent(steamURL),
+                    success: function(data) { callfaceit(data, player); },
+                    error: function(data) { callfaceit(data, player); }
+                   });
+        });
+    }
+};
 
 angular.element(document).ready(function() {
-	angular.element(document).injector().invoke(function($compile) {
-        var gameElement = $("section.match-vs");
-        var game = angular.element(gameElement).scope();
-
-        game.$watch('match',
-            function(match) {
-                if (match != null) {
-            		var factions = match.faction1.slice(0).concat(match.faction2);
-		    		cleanPrevious();
-                    
-                    $(factions).each(function(index, player) {
-	                    var steamID = player['csgo_id'];
-	                    var steamURL = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=" + webkey + "&steamid=" + steamID + "&format=json"
-
-	                    // Proxy based on https://github.com/afeld/jsonp 
-	                    $.ajax({   url: "https://jsonp-steamid-proxy.herokuapp.com/?url=" + encodeURIComponent(steamURL),
-	                                success: function(data) { callfaceit(data, player); },
-	                                error: function(data) { callfaceit(data, player); }
-	                    });
-                    });
-                }
+	angular.element(document).injector().invoke(function($compile, $location) {
+        var thisDocument = angular.element(document).scope();
+        thisDocument.location = $location;
+        thisDocument.$watch( 'location.url()', function( url ) {
+            if (url && url.indexOf('en/csgo/room/') > -1) {
+                var gameElement = $("section.match-vs");
+                var pageDocument = angular.element(gameElement).scope();
+                var game = angular.element(gameElement).scope();   
+        
+                game.$watch('match', drawStats);
             }
-        );
+        });
     });
 });
 
@@ -83,8 +90,7 @@ var extractHours = function(data) {
 };
 
 var drawcustomstats = function(data, player) {
-	
-    var skillLevelImgURL = "https://cdn.faceit.com/frontend/75/assets/images/skill-icons/skill_level_" + player['csgo_skill_level'] + "_sm.png";
+    var skillLevelImgURL = "https://cdn.faceit.com/frontend/75/assets/images/skill-icons/skill_level_" + player['skill_level_label'] + "_sm.png";
     var skillLevelDiv = $("<div></div>").addClass("custom_skill_level");
     var skillLevelImg = $("<img/>").attr({ src: skillLevelImgURL})
     skillLevelDiv.css({
