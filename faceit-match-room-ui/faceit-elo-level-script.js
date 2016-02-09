@@ -15,7 +15,7 @@
 var webkey = "YOUR STEAM WEB API KEY GOES HERE";
          
 var drawStats = function(match) {
-    if (match != null && $(".custom_stats_field").length != 10) {
+    if (match != null && match.state != "voting") {	// NOTE: maybe hook into angular and change templates for this...
         var factions = match.faction1.slice(0).concat(match.faction2);
  
         $(factions).each(function(index, player) {
