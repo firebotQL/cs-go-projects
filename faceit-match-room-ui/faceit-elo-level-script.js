@@ -22,8 +22,8 @@ angular.element(document).ready(function() {
         game.$watch('match',
             function(match) {
                 if (match != null) {
-                    var factions = match.faction1.slice(0).concat(match.faction2);
-		    cleanPrevious();
+            		var factions = match.faction1.slice(0).concat(match.faction2);
+		    		cleanPrevious();
                     
                     $(factions).each(function(index, player) {
 	                    var steamID = player['csgo_id'];
@@ -31,8 +31,8 @@ angular.element(document).ready(function() {
 
 	                    // Proxy based on https://github.com/afeld/jsonp 
 	                    $.ajax({   url: "https://jsonp-steamid-proxy.herokuapp.com/?url=" + encodeURIComponent(steamURL),
-	                                success: function(data) { callfaceit(data, player, index); },
-	                                error: function(data) { callfaceit(data, player, index); }
+	                                success: function(data) { callfaceit(data, player); },
+	                                error: function(data) { callfaceit(data, player); }
 	                    });
                     });
                 }
@@ -48,18 +48,21 @@ var cleanPrevious = function() {
     } catch (err) {};
 };
 
-var callfaceit = function(previousData, player, index) {
+var callfaceit = function(previousData, player) {
+	var nickname = player['nickname'];
 	$.ajax({   url: "https://api.faceit.com/api/nicknames/" + player['nickname'], 
 				success: function(data) { 
 					try {
 						player = data['payload']['games']['csgo'];
+						player['nickname'] = nickname;
 						player['hours'] = extractHours(previousData);
 					} catch (err) {}
-					drawcustomstats(data, player, index); 
+					drawcustomstats(data, player); 
 				},
 	            error: function(data) { 
 	            	player['hours'] = extractHours(previousData);
-	            	drawcustomstats(data, player, index); 
+	            	player['nickname'] = nickname;
+	            	drawcustomstats(data, player); 
 	            }
 	});
 };
@@ -79,8 +82,7 @@ var extractHours = function(data) {
 	return hours;
 };
 
-var drawcustomstats = function(data, player, index) {
-	var matchItem = $(".match-team-member:eq(" + index + ")");
+var drawcustomstats = function(data, player) {
 	
     var skillLevelImgURL = "https://cdn.faceit.com/frontend/75/assets/images/skill-icons/skill_level_" + player['csgo_skill_level'] + "_sm.png";
     var skillLevelDiv = $("<div></div>").addClass("custom_skill_level");
@@ -106,7 +108,7 @@ var drawcustomstats = function(data, player, index) {
 	statsDiv.append(" Hours: ")
 	statsDiv.append(hoursField);
 	statsContainerDiv.append(statsDiv);
-
-    matchItem.find('.match-team-member__avatar').append(skillLevelDiv);
-    matchItem.find('.match-team-member__row').append(statsContainerDiv);
+	var matchItem = $("a.match-team-member__name strong:contains('" + player['nickname'] + "')").parent().parent().parent().parent();
+    	matchItem.find('.match-team-member__avatar').append(skillLevelDiv);
+    	matchItem.find('.match-team-member__row').append(statsContainerDiv);
 };
