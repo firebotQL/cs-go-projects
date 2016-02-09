@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FaceIT match room advanced stats
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  Shows elo, level and cs go steam hours for each player on match screen.
 // @author       Viaceslavas 'fire_bot' Duk
 // @match        https://beta.faceit.com/*
@@ -13,11 +13,10 @@
 
 // You can get your web api key from https://steamcommunity.com/dev/apikey 
 var webkey = "YOUR STEAM WEB API KEY GOES HERE";
-        
+         
 var drawStats = function(match) {
-    if (match != null) {
+    if (match != null && $(".custom_stats_field").length != 10) {
         var factions = match.faction1.slice(0).concat(match.faction2);
-        cleanPrevious();
  
         $(factions).each(function(index, player) {
             var steamID = player['csgo_id'];
@@ -36,12 +35,12 @@ angular.element(document).ready(function() {
 	angular.element(document).injector().invoke(function($compile, $location) {
         var thisDocument = angular.element(document).scope();
         thisDocument.location = $location;
-        thisDocument.$watch( 'location.url()', function( url ) {
+        thisDocument.$watch( 'location.url()', function(url) {
             if (url && url.indexOf('en/csgo/room/') > -1) {
                 var gameElement = $("section.match-vs");
                 var pageDocument = angular.element(gameElement).scope();
                 var game = angular.element(gameElement).scope();   
-        
+        		
                 game.$watch('match', drawStats);
             }
         });
