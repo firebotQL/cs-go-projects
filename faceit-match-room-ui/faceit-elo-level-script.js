@@ -23,6 +23,7 @@ angular.element(document).ready(function() {
             function(match) {
                 if (match != null) {
                     var factions = match.faction1.slice(0).concat(match.faction2);
+		    cleanPrevious();
                     
                     $(factions).each(function(index, player) {
 	                    var steamID = player['csgo_id'];
@@ -39,6 +40,13 @@ angular.element(document).ready(function() {
         );
     });
 });
+
+var cleanPrevious = function() {
+    try {
+            $(".custom_skill_level").remove();
+            $(".custom_stats_field").remove();
+    } catch (err) {};
+};
 
 var callfaceit = function(previousData, player, index) {
 	$.ajax({   url: "https://api.faceit.com/api/nicknames/" + player['nickname'], 
