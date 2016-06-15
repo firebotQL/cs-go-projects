@@ -4,7 +4,7 @@
 // @version      0.3
 // @description  Shows elo, level and cs go steam hours for each player on match screen.
 // @author       Viaceslavas 'fire_bot' Duk
-// @match        https://beta.faceit.com/*
+// @match        https://www.faceit.com/en/csgo/room/*
 // @grant        none
 // ==/UserScript==
 // CREDIT AND KUDOS TO: PyroZeroX. AngularJS example from: https://gist.github.com/PyroZeroX/9e75b2a205e842b0ecbb
@@ -89,7 +89,7 @@ var extractHours = function(data) {
 };
 
 var drawcustomstats = function(data, player) {
-    var skillLevelImgURL = "https://cdn.faceit.com/frontend/75/assets/images/skill-icons/skill_level_" + player['skill_level_label'] + "_sm.png";
+    var skillLevelImgURL = "https://cdn.faceit.com/frontend/155/assets/images/skill-icons/skill_level_" + player['skill_level_label'] + "_sm.png";
     var skillLevelDiv = $("<div></div>").addClass("custom_skill_level");
     var skillLevelImg = $("<img/>").attr({ src: skillLevelImgURL})
     skillLevelDiv.css({
